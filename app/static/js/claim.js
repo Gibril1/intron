@@ -81,6 +81,8 @@ const url = window.location.href;
 // Selected user 
 var selectedUser = document.getElementById('user-claim');
 var userAge = document.getElementById('user-age');
+var maleGender = document.getElementById('gender-male');
+var femaleGender = document.getElementById('gender-female');
 
 function claim() {
     /*
@@ -115,21 +117,35 @@ $("#add-service").click(function(){
     $("#service-div").before(serviceForm)
 })
 
+
 selectedUser.addEventListener('change', function() {
     /*
-        An event on the selected user, for calculating their age
+        An event on the selected user, for calculating their age and setting their gender
     */
-    request = {}
-    request.age = selectedUser.value;
+    var request = { age: selectedUser.value };
+
     $.ajax({
         type: 'POST',
         url : `${url}/age/`,
         data: request,
-        success: function(response){
-           userAge.value = response.age
+        success: function(response) {
+
+            console.log(response);
+            userAge.value = response.age;
+            
+
+            // Ensure only one gender is selected based on response
+            if (response.gender === "male") {
+                maleGender.checked = true;
+                femaleGender.checked = false;
+            } else if (response.gender === "female") {
+                femaleGender.checked = true;
+                maleGender.checked = false;
+            }
         },
         error: function(error) {
-            console.log(error)
+            console.log(error);
         }
-    })
+    });
 });
+

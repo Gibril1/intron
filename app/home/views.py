@@ -160,14 +160,26 @@ def create_claim():
 @home_blueprint.route('create_claim/age/', methods=['POST'])
 def user_age():
     """
-        A route to get a user's birthdate
-        and calculate his age 
+    A route to get a user's birthdate and calculate their age 
+    and return their gender.
     """
     if request.method == "POST":
-        data = request.form.get("age").strip()
-        user = User.query.filter_by(name=data).first()
-        age = (dt.date.today().year - user.date_of_birth.year)
-        print(age)
- 
-    
-    return jsonify({'age': age})
+        user_name = request.form.get("age", "").strip()
+
+        # Retrieve user from the database
+        user = User.query.filter_by(name=user_name).first()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Calculate age
+        age = dt.date.today().year - user.date_of_birth.year
+        print(f'The age of this user is {age}')
+
+        # Log gender to check if it's retrieved
+        print(f'User gender: {user.gender}')
+
+        return jsonify({
+            'age': age,
+            'gender': user.gender  # Ensure the frontend gets the gender
+        })
+

@@ -24,6 +24,23 @@
                     </div>
                 </div>
 
+                <!-- Add Gender Label -->
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label for="gender-male">Gender</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <input type="radio" id="gender-male" name="gender" value="Male" readonly>
+                            <label for="gender-male">Male</label><br>
+                
+                            <input type="radio" id="gender-female" name="gender" value="Female" readonly>
+                            <label for="gender-female">Female</label><br>
+                        </div>
+                    </div>
+                </div>
+                
+
                 <div class="row">
                     <div class="col-sm-4">
                         <label for="user-claim">Diagnosis</label>
@@ -58,10 +75,13 @@
                     </div>
                     <div class="col-sm-8">
                         <div class="form-group">
-                            <input type="number" id="user-age" name="age" class="form-control" placeholder="Age" min="0" value="" required readonly>
+                            <input type="number" id="user-age" name="age" class="form-control" placeholder="Age" min="0" max="150" required readonly>
                         </div>
                     </div>
                 </div>
+
+
+                <!-- Services Provided -->
 
                 <div class="row text-center" id="service-section">
                     <h3> Service Section</h3>
