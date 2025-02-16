@@ -103,7 +103,39 @@ def claim():
     List all Claims
     """
     all_claims = Claim.query.all()
+
+    print("****all claims******", all_claims)
     return render_template('home/claim.html', claims=all_claims, title="Claims")
+
+@home_blueprint.route('claim/<int:id>/', methods=['GET', 'PUT', 'DELETE'])
+def claim_detail(id):
+    """
+        A route that allows claim officer fillout a form for a particular user
+    """
+    claim = Claim.query.get(int(id))
+    if request.method == 'GET':
+        return render_template('home/claim_detail.html', claim=claim)
+    
+    elif request.method == 'PUT':
+        claim.diagnosis = request.form.get('diagnosis')
+        claim.hmo = request.form.get('hmo')
+        claim.age = request.form.get('age')
+        claim.service_charge = request.form.get('service_charge')
+        claim.total_cost = request.form.get('total_cost')
+        claim.final_cost = request.form.get('final_cost')
+
+        database.session.commit()
+        flash('Claim updated successfully!', 'success')
+        return redirect(url_for('home.claim', id=claim.id))
+    
+    elif request.method == 'DELETE':
+        database.session.delete(claim)
+        database.session.commit()
+        flash('Claim deleted successfully!', 'danger')
+        return redirect(url_for('home.claim')) 
+
+
+
 
 @home_blueprint.route('create_claim', methods=['GET', 'POST'])
 def create_claim():
@@ -117,13 +149,21 @@ def create_claim():
         user = request.form.get('user')
         diagnosis = request.form.get('diagnosis')
         hmo = request.form.get('hmo')
+        age = request.form.get('age')
 
         total_cost = request.form.get('total_cost')
         service_charge = request.form.get('service_charge')
         final_cost = request.form.get('final_cost')
 
         user = User.query.filter_by(name=user).first()
-        new_claim = Claim(user_id=user.id, diagnosis=diagnosis, hmo=hmo, service_charge=service_charge,total_cost=total_cost, final_cost=final_cost)
+        new_claim = Claim(
+            user_id=user.id, 
+            diagnosis=diagnosis, 
+            hmo=hmo, 
+            age=age,
+            service_charge=service_charge,total_cost=total_cost, 
+            final_cost=final_cost
+        )
         database.session.add(new_claim)
         database.session.commit()
 
@@ -143,7 +183,8 @@ def create_claim():
         print("Anthony", service_date)
 
         # Get the above claim as foreign key for services
-        claim = Claim.query.filter().last()
+        # claim = Claim.query.filter().last()
+        claim = Claim.query.get(new_claim.id)
 
         # Loop to enter possible list of services
         for i in range(len(service_name)):

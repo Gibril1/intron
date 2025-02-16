@@ -17,6 +17,8 @@ def create_app(config_name):
 
     application.config.from_object(app_config[config_name])
     application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    application.config["DEBUG"] = True
+
 
     database.init_app(application)
     

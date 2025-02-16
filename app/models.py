@@ -33,7 +33,7 @@ class Claim(database.Model):
     service = database.relationship('Service', backref='')
 
     def __repr__(self):
-        return '<CLaim: {}>'.format(self.service)
+        return '<CLaim: {}>'.format(self.diagnosis)
 
 
 class Service(database.Model):

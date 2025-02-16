@@ -14,16 +14,26 @@
                         <tr>
                             <th scope="col th-sm">S/N</th>
                             <th scope="col th-sm">Name</th>
-                            <th scope="col th-sm">Salary</th>
-                            <th scope="col th-sm">Date Joined</th>
-                            <th scope="col th-sm">Action</th>
+                            <th scope="col th-sm">HMO</th>
+                            <th scope="col th-sm">Total Cost</th>
+                            <th scope="col th-sm">View</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for claim in claims %}
-  
-                        {% endfor %}
+                        <tr class='clickable-row'>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>{{ claim.user.name }}</td>
+                            <td>{{ claim.hmo }}</td>
+                            <td>{{ claim.final_cost }}</td>
+                            <td>
+                                <a href="{{url_for('home.claim_detail', id=claim.id)}}">
+                                    <span class="material-icons outlined"> visibility </span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}                 
                     </tbody>
                 </table>
 

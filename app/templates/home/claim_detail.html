@@ -1,0 +1,86 @@
+{% extends "home/base.html" %}
+
+{% block title %}Claim Detail{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4>Claim Details</h4>
+        </div>
+        <div class="card-body">
+            <form id="claimForm" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Diagnosis</label>
+                    <input type="text" class="form-control" name="diagnosis" value="{{ claim.diagnosis }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">HMO</label>
+                    <input type="text" class="form-control" name="hmo" value="{{ claim.hmo }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Age</label>
+                    <input type="number" class="form-control" name="age" value="{{ claim.age }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Service Charge</label>
+                    <input type="number" class="form-control" name="service_charge" value="{{ claim.service_charge }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">HMO</label>
+                    <select class="form-control" name="hmo">
+                        <option value="HMO1" {% if claim.hmo == 'HMO1' %}selected{% endif %}>HMO1</option>
+                        <option value="HMO2" {% if claim.hmo == 'HMO2' %}selected{% endif %}>HMO2</option>
+                        <option value="HMO3" {% if claim.hmo == 'HMO3' %}selected{% endif %}>HMO2</option>
+                        <option value="HMO4" {% if claim.hmo == 'HMO4' %}selected{% endif %}>HMO2</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Final Cost</label>
+                    <input type="number" class="form-control" name="final_cost" value="{{ claim.final_cost }}">
+                </div>
+
+                <button type="button" class="btn btn-success" onclick="updateClaim()">Update Claim</button>
+                <button type="button" class="btn btn-danger" onclick="deleteClaim()">Delete Claim</button>
+                <a href="{{ url_for('home.claim') }}" class="btn btn-secondary">Back</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateClaim() {
+        fetch(window.location.href, {
+            method: 'PUT',
+            body: new FormData(document.getElementById('claimForm'))
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                alert('Claim updated successfully!');
+            }
+        })
+        .catch(error => console.error('Error updating claim:', error));
+    }
+
+    function deleteClaim() {
+        if (confirm("Are you sure you want to delete this claim?")) {
+            fetch(window.location.href, { method: 'DELETE' })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    alert('Claim deleted successfully!');
+                }
+            })
+            .catch(error => console.error('Error deleting claim:', error));
+        }
+    }
+</script>
+{% endblock %}
