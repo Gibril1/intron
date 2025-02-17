@@ -1,11 +1,110 @@
 {% extends "home/base.html" %}
 
-{% block title %} User{% endblock %}
+{% block title %} User Details {% endblock %}
 
 {% block body %}
-    <div class="user">
-        <h2>
-            {{ user_data.name}}
-        </h2>
+<div class="container mt-4">
+    <!-- User Details Card -->
+    <div class="card shadow-lg mb-5">
+        <div class="card-header bg-primary text-white py-3">
+            <h2 class="card-title mb-0"><i class="bi bi-person-circle me-2"></i>{{ user_data.name }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-3">
+                        <strong><i class="bi bi-cash-coin me-2"></i>Salary:</strong>
+                        <span class="text-success">${{ user_data.salary }}</span>
+                    </p>
+                    <p class="mb-3">
+                        <strong><i class="bi bi-gender-ambiguous me-2"></i>Gender:</strong>
+                        {{ user_data.gender or "N/A" }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-3">
+                        <strong><i class="bi bi-calendar-event me-2"></i>Date of Birth:</strong>
+                        {{ user_data.date_of_birth.strftime('%Y-%m-%d') if user_data.date_of_birth else "N/A" }}
+                    </p>
+                    <p class="mb-3">
+                        <strong><i class="bi bi-clock-history me-2"></i>Member Since:</strong>
+                        {{ user_data.time_created.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Claims Section -->
+    <h3 class="mb-4 border-bottom pb-2"><i class="bi bi-files me-2"></i>Claims</h3>
+    
+    {% if claims %}
+        {% for claim in claims %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-file-medical me-2"></i>{{ claim.diagnosis }}
+                </h5>
+                <span class="badge bg-info fs-6">{{ claim.hmo }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <p class="mb-0"><strong>Age:</strong> {{ claim.age or "N/A" }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-0"><strong>Service Charge:</strong> ${{ claim.service_charge }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-0"><strong>Total Cost:</strong> ${{ claim.total_cost }}</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-success mb-4">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        Final Cost
+                        <span class="badge bg-primary rounded-pill fs-5">${{ claim.final_cost }}</span>
+                    </h5>
+                </div>
+
+                <h5 class="mb-3"><i class="bi bi-list-task me-2"></i>Services</h5>
+                {% if claim.service %}
+                    <div class="row g-3">
+                        {% for service in claim.service %}
+                        <div class="col-12">
+                            <div class="card hover-shadow">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title mb-1">
+                                                {{ service.service_name }}
+                                                <span class="badge bg-secondary ms-2">{{ service.type }}</span>
+                                            </h6>
+                                            <p class="mb-0 text-muted small">
+                                                {{ service.provider_name }} • {{ service.source }}
+                                            </p>
+                                        </div>
+                                        <span class="badge bg-success fs-6">
+                                            ${{ service.cost_of_service }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-circle me-2"></i>No services recorded for this claim
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>No claims available for this user
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

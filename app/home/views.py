@@ -2,7 +2,7 @@ from flask import flash, jsonify, render_template, redirect, request, url_for
 
 from app.models import Claim, Service, User
 from . import home as home_blueprint
-from app.forms import AddUser
+from app.forms import AddUser, AddClaim
 from app import database
 from datetime import datetime
 import datetime as dt
@@ -16,13 +16,18 @@ def all_users():
     all_users = User.query.all()
     return render_template('home/home.html', users=all_users, title="Users")
 
-@home_blueprint.route('/user/<int:id>', methods=['GET', 'POST'])
+@home_blueprint.route('/user/<int:id>', methods=['GET'])
 def view_user(id):
     """
-        A route that allows claim officer fillout a form for a particular user
+    A route that displays user details along with their claims and services.
     """
-    user_data = User.query.get(int(id))
-    return render_template('home/user_data.html', user_data=user_data)
+    user_data = User.query.get_or_404(id)
+    
+    # Fetch all claims related to the user
+    claims = Claim.query.filter_by(user_id=id).all()
+    
+    return render_template('home/user_data.html', user_data=user_data, claims=claims)
+
 
 @home_blueprint.route('/user/<int:id>/edit', methods=['GET', 'POST'])
 def edit_user(id):
@@ -46,6 +51,14 @@ def edit_user(id):
             user_data.gender = gender
             user_data.salary = salary
             user_data.date_of_birth = dt_obj
+
+            # Calculate new age
+            new_age = dt.date.today().year - user_data.date_of_birth.year
+
+            # Update all related claims with new age
+            claims = Claim.query.filter_by(user_id=id).all()
+            for claim in claims:
+                claim.age = new_age
 
             database.session.commit()
 
@@ -136,16 +149,17 @@ def claim_detail(id):
 
 
 
-
-@home_blueprint.route('create_claim', methods=['GET', 'POST'])
+@home_blueprint.route('/create_claim', methods=['GET', 'POST'])
 def create_claim():
     """
-        A route for a claim officer to make/create a claim
-    """
+    A route for a claim officer to make/create a claim.
+    """ 
 
-    if request.method == 'POST':
-        # Get the form field values for claim model insertion
+    form = AddClaim()
+    all_users = User.query.with_entities(User.name).all()
 
+
+    if request.method == "POST":
         user = request.form.get('user')
         diagnosis = request.form.get('diagnosis')
         hmo = request.form.get('hmo')
@@ -180,7 +194,7 @@ def create_claim():
         service_date = []
         for d in dates:
             service_date.append(datetime.strptime(d, '%Y-%m-%d'))
-        print("Anthony", service_date)
+        print("Service Dates", service_date)
 
         # Get the above claim as foreign key for services
         # claim = Claim.query.filter().last()
@@ -195,17 +209,18 @@ def create_claim():
         flash('Claim created successfully.', 'success')
         return redirect(url_for('home.claim'))
     else:
-        all_users = User.query.with_entities(User.name).all()
-        return render_template('home/create_claim.html', all_users=all_users)
+        return render_template('home/create_claim.html', form=form, all_users=all_users)
 
-@home_blueprint.route('create_claim/age/', methods=['POST'])
+
+@home_blueprint.route('create_claim/user_details/', methods=['POST'])
 def user_age():
     """
     A route to get a user's birthdate and calculate their age 
     and return their gender.
     """
     if request.method == "POST":
-        user_name = request.form.get("age", "").strip()
+        print(f'The request form is {request.form}')
+        user_name = request.form.get("name", "").strip()
 
         # Retrieve user from the database
         user = User.query.filter_by(name=user_name).first()

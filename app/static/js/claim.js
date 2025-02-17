@@ -94,6 +94,8 @@ function claim() {
     var finalCost = document.getElementById('final-cost');
     var costOfService = document.getElementsByClassName("services");
    
+    // console.log(costOfService)
+    console.log("total cost", totalCost.value)
 
     arr= []
     for(let i=0; i<costOfService.length; i++){
@@ -122,11 +124,14 @@ selectedUser.addEventListener('change', function() {
     /*
         An event on the selected user, for calculating their age and setting their gender
     */
-    var request = { age: selectedUser.value };
+    var request = { name: selectedUser.value };
+
+    
+    console.log("selected user", selectedUser)
 
     $.ajax({
         type: 'POST',
-        url : `${url}/age/`,
+        url : `${url}/user_details/`,
         data: request,
         success: function(response) {
 
